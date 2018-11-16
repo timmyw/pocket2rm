@@ -17,8 +17,12 @@ func main() {
 	p.Init()
 
 	switch *command {
-		case "pull":
-		case "auth":
+	case "url":
 		p.Authorise()
+		fmt.Println(p2rm.GenerateAuthURL(p.Code))
+	case "pull":
+	case "auth":
+		p.Authorise()
+		p.GetAccessToken()
 	}
 }

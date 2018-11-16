@@ -1,0 +1,9 @@
+* Pocket2RM
+
+** Authorising via Pocket website
+
+#+BEGIN_SRC sh
+curl "https://getpocket.com/auth/authorize?redirect_uri=localhost&request_token=REQUEST_TOKEN"
+#+END_SRC
+code:81fd2224-564a-7989-f0af-bcd6f5
+

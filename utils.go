@@ -9,7 +9,7 @@ import (
 
 func sendJSON(req *http.Request, res interface{}) error {
 	req.Header.Add("X-Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
