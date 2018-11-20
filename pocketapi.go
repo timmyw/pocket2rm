@@ -30,20 +30,42 @@ func Authorise(consumerKey string) (string, error) {
 	
 }
 
-// PocketToken stores the returned access token and user name from an
+// AccessToken stores the returned access token and user name from an
 // access call
-type PocketToken struct {
+type AccessToken struct {
 	Token		 string `json:"access_token"`
 	Username	 string `json:"username"`
 }
 
-// GetToken will retrieve an access token from Pocket
-func GetToken(consumerKey string, code string) (*PocketToken, error) {
-	result := &PocketToken{}
+// RequestToken stores the initial request token
+type RequestToken struct {
+}
+
+// GetRequestToken will retrieve a RequestToken from Pocket
+func GetRequestToken(consumerKey string) (*RequestToken, error) {
+	result := &RequestToken{}	
+	err := PostJSON("/v3/oauth/request",
+		map[string]string {
+			"consumer_key"	: consumerKey,
+			"redirect_uri"  : "http://localhost",
+		},
+		result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+
+}
+
+// GetAccessToken will retrieve an access token from Pocket
+func GetAccessToken(consumerKey string, requestCode string) (*AccessToken, error) {
+	result := &AccessToken{}
 	err := PostJSON("/v3/oauth/authorize",
 		map[string]string {
 			"consumer_key"	: consumerKey,
-			"code"		: code,
+			"code"		: requestCode,
 		},
 		result)
 

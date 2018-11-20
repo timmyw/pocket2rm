@@ -39,3 +39,4 @@ func PostJSON(url string, data, res interface{}) error {
 
 	return sendJSON(req, res)
 }
+

@@ -8,48 +8,60 @@ import (
 
 const version = "0.0.1"
 
-// Contains the default configuration file
-var configFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
+// ConfigFile contains the default configuration file
+var ConfigFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
 
 // Pocket2RM contains the interface to the Pocket2RM API
 type Pocket2RM struct {
-	version	 string
-	config	 *confer.Config
-	Code	 string
-	token	 *PocketToken
+	version		 string
+	Config		 *confer.Config
+	ConsumerKey	 string
+	RequestToken	 *RequestToken
+	AccessToken      *AccessToken
+	init             bool
 }
 
 // Init performs any initialisation (such as loading API keys etc).
 func (p *Pocket2RM) Init() {
-	p.config = confer.NewConfig()
-	p.config.ReadPaths(configFile)
-}
-
-// Authorise carries out an OAUTH call to Pocket to get a token
-func (p *Pocket2RM) Authorise() {
-
-	code, err := Authorise(p.config.GetString("consumer_key"))
+	if p.init {
+		return
+	}
+	p.Config = confer.NewConfig()
+	p.Config.ReadPaths(ConfigFile)
+	key, err := Authorise(p.Config.GetString("consumer_key"))
 
 	if err != nil {
 		panic(err)
 	}
 
-	p.Code = code
+	p.ConsumerKey = key
+	p.init = true
+}
+
+// GetRequestToken calls into the API to get an initial request token
+func (p *Pocket2RM) GetRequestToken() {
+	var err error
+	p.RequestToken, err = GetRequestToken(p.ConsumerKey)
+	if (err != nil) {
+		panic(err)
+	}
+
+	fmt.Printf("%+v\n", *p.RequestToken)
 }
 
 // GetAccessToken carries out an OAUTH call to Pocket to get a token
-func (p *Pocket2RM) GetAccessToken() {
+// func (p *Pocket2RM) GetAccessToken() {
 
-	var err error
-	p.token, err = GetToken(p.config.GetString("consumer_key"),
-		p.Code)
-	if err != nil {
-		panic(err)
-	}
+// 	var err error
+// 	p.token, err = GetToken(p.Config.GetString("consumer_key"),
+// 		p.Code)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	fmt.Printf("%+v\n", *p.token)
-}
+// 	fmt.Printf("%+v\n", *p.token)
+// }
 
-func PullFromPocket() {
+// func PullFromPocket() {
 
-}
+// }

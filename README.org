@@ -1,5 +1,19 @@
 * Pocket2RM
 
+** Authorisation process
+
+   + Load the access token (app - loadToken)
+   + If that fails then we need to re-auth (app - authWithPocket)
+     1. Load the consumer code (p2rm)
+     2. Get a request token (p2rm)
+     3. Redirect user to oauth url (app)
+        1. Get the URL
+        2. Start a local listener
+        3. Give the user the URL
+        4. Listen for a response
+     4. Get callback from pocket (app)
+     5. Convert request token into access token (p2rm)
+
 ** Authorising via Pocket website
 
 #+BEGIN_SRC sh
