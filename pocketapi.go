@@ -11,10 +11,13 @@ type PocketCode struct {
 	Code string `json:"code"`
 }
 
+// APIOrigin contains the destination
+const APIOrigin = "https://getpocket.com"
+
 // Authorise carries out an auth call to Pocket to get a token
 func Authorise(consumerKey string) (string, error) {
 	// First step is to get a token from the Pocket servers
-	url := "https://getpocket.com/v3/oauth/request"
+	url := "/v3/oauth/request"
 	params := map[string]interface{}{
 		"consumer_key": consumerKey,
 		"redirect_uri": "http://localhost",
@@ -40,6 +43,7 @@ type AccessToken struct {
 
 // RequestToken stores the initial request token
 type RequestToken struct {
+	Code string `json:"code"`
 }
 
 // GetRequestToken will retrieve a RequestToken from Pocket
@@ -61,12 +65,12 @@ func GetRequestToken(consumerKey string) (*RequestToken, error) {
 }
 
 // GetAccessToken will retrieve an access token from Pocket
-func GetAccessToken(consumerKey string, requestCode string) (*AccessToken, error) {
+func GetAccessToken(consumerKey string, requestToken *RequestToken) (*AccessToken, error) {
 	result := &AccessToken{}
 	err := PostJSON("/v3/oauth/authorize",
 		map[string]string {
 			"consumer_key"	: consumerKey,
-			"code"		: requestCode,
+			"code"		: requestToken.Code,
 		},
 		result)
 
@@ -80,6 +84,6 @@ func GetAccessToken(consumerKey string, requestCode string) (*AccessToken, error
 // GenerateAuthURL will return the URL to redirect the user to in
 // order to authorise the app with Pocket
 func GenerateAuthURL(code string, redirect string) string {
-	params := url.Values{ "code": {code}, "redirect_uri": {redirect}}
-	return fmt.Sprintf("https://getpocket.com/auth/authorize?%s", params.Encode())
+	params := url.Values{ "request_token": {code}, "redirect_uri": {redirect}}
+	return fmt.Sprintf("%s/auth/authorize?%s", APIOrigin, params.Encode())
 }

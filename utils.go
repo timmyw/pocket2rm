@@ -2,6 +2,7 @@ package pocket2rm
 
 import (
 	"fmt"
+	"os"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 func sendJSON(req *http.Request, res interface{}) error {
 	req.Header.Add("X-Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
-
+	fmt.Printf("req.URL: %s\n", req.URL)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
@@ -32,11 +33,36 @@ func PostJSON(url string, data, res interface{}) error {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	fmt.Printf("PARAMS:%v+\n", data)
+	req, err := http.NewRequest("POST", APIOrigin+url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
 
 	return sendJSON(req, res)
+}
+
+// SaveJSONToFile dumps the supplied struct to the file in JSON format
+func SaveJSONToFile(path string, v interface{}) error {
+	w, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	defer w.Close()
+
+	return json.NewEncoder(w).Encode(v)
+}
+
+// LoadJSONFromFile loads the JSON file into the supplied interface{}
+func LoadJSONFromFile(path string, v interface{}) error {
+	r, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	defer r.Close()
+
+	return json.NewDecoder(r).Decode(v)
 }
 

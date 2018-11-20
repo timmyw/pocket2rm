@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	
+
 	p2rm "github.com/timmyw/pocket2rm"
 )
 
 func loadToken(p *p2rm.Pocket2RM) {
-	var token = p.Token
+	var token = p.AccessToken
 	if token == nil {
 		// The user needs to (re)auth us with pocket
 		authWithPocket(p)
@@ -22,8 +22,7 @@ func authWithPocket(p *p2rm.Pocket2RM) {
 	p.Init()
 	// Get an initial request token
 	p.GetRequestToken()
-	
-	redirectURI := p2rm.GenerateAuthURL(p.Code)
+
 	ch := make(chan struct{})
 	ts := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -38,11 +37,12 @@ func authWithPocket(p *p2rm.Pocket2RM) {
 		}))
 	defer ts.Close()
 
-	url := p2rm.GenerateAuthURL(ts.URL)
+	url := p2rm.GenerateAuthURL(p.RequestToken.Code, ts.URL)
+	fmt.Println(url)
 
-	<- ch
+	<-ch
 
-	
+	p.GetAccessToken()
 }
 
 func main() {
@@ -51,18 +51,15 @@ func main() {
 	flag.Parse()
 	fmt.Printf("%s\n", *command)
 
-	var p *p2rm.Pocket2RM = new(p2rm.Pocket2RM)
+	var p = new(p2rm.Pocket2RM)
 	p.Init()
 
 	loadToken(p)
-	
+
 	switch *command {
-	case "url":
-		p.Authorise()
-		fmt.Println(p2rm.GenerateAuthURL(p.Code))
 	case "pull":
 	case "auth":
-		p.Authorise()
-		p.GetAccessToken()
+		//p.Authorise()
+		//p.GetAccessToken()
 	}
 }

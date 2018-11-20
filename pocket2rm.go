@@ -10,6 +10,7 @@ const version = "0.0.1"
 
 // ConfigFile contains the default configuration file
 var ConfigFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
+var AccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.json")
 
 // Pocket2RM contains the interface to the Pocket2RM API
 type Pocket2RM struct {
@@ -28,13 +29,22 @@ func (p *Pocket2RM) Init() {
 	}
 	p.Config = confer.NewConfig()
 	p.Config.ReadPaths(ConfigFile)
-	key, err := Authorise(p.Config.GetString("consumer_key"))
+	p.ConsumerKey = p.Config.GetString("consumer_key")
 
-	if err != nil {
-		panic(err)
+	p.AccessToken = nil
+	accessToken := &AccessToken{}
+	err := LoadJSONFromFile(AccessFile, accessToken)
+	if err == nil {
+		p.AccessToken = accessToken
 	}
+	
+	// key, err := Authorise(p.Config.GetString("consumer_key"))
 
-	p.ConsumerKey = key
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// p.ConsumerKey = key
 	p.init = true
 }
 
@@ -50,17 +60,20 @@ func (p *Pocket2RM) GetRequestToken() {
 }
 
 // GetAccessToken carries out an OAUTH call to Pocket to get a token
-// func (p *Pocket2RM) GetAccessToken() {
+func (p *Pocket2RM) GetAccessToken() {
 
-// 	var err error
-// 	p.token, err = GetToken(p.Config.GetString("consumer_key"),
-// 		p.Code)
-// 	if err != nil {
-// 		panic(err)
-// 	}
+	var err error
+	p.AccessToken, err = GetAccessToken(p.Config.GetString("consumer_key"),
+		p.RequestToken)
+	if err != nil {
+		panic(err)
+	}
 
-// 	fmt.Printf("%+v\n", *p.token)
-// }
+	fmt.Printf("%+v\n", *p.AccessToken)
+
+	// Store the token for next time
+	SaveJSONToFile(AccessFile, p.AccessToken)
+}
 
 // func PullFromPocket() {
 
