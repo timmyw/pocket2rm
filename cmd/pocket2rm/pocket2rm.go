@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	
 	p2rm "github.com/timmyw/pocket2rm"
 )
@@ -24,7 +25,7 @@ func authWithPocket(p *p2rm.Pocket2RM) {
 	
 	redirectURI := p2rm.GenerateAuthURL(p.Code)
 	ch := make(chan struct{})
-	ts := http.NewServer(
+	ts := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.URL.Path == "/favicon.ico" {
 				http.Error(w, "Not Found", 404)
@@ -37,6 +38,11 @@ func authWithPocket(p *p2rm.Pocket2RM) {
 		}))
 	defer ts.Close()
 
+	url := p2rm.GenerateAuthURL(ts.URL)
+
+	<- ch
+
+	
 }
 
 func main() {

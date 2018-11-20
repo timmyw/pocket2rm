@@ -2,6 +2,7 @@ package pocket2rm
 
 import (
 	"fmt"
+	"net/url"
 )
 
 // PocketCode contains the code returned from the first Pocket auth
@@ -78,6 +79,7 @@ func GetAccessToken(consumerKey string, requestCode string) (*AccessToken, error
 
 // GenerateAuthURL will return the URL to redirect the user to in
 // order to authorise the app with Pocket
-func GenerateAuthURL(code string) string {
-	return fmt.Sprintf("https://getpocket.com/auth/authorize?redirect_uri=http://localhost&request_token=%s", code)
+func GenerateAuthURL(code string, redirect string) string {
+	params := url.Values{ "code": {code}, "redirect_uri": {redirect}}
+	return fmt.Sprintf("https://getpocket.com/auth/authorize?%s", params.Encode())
 }
