@@ -2,6 +2,7 @@ package pocket2rm
 
 import (
 	"fmt"
+//	"time"
 	"net/url"
 )
 
@@ -9,6 +10,47 @@ import (
 // call.
 type PocketCode struct {
 	Code string `json:"code"`
+}
+
+// ItemStatus is a typedef wrapping the status of an item
+type ItemStatus int
+
+// Item contains all the data returned 
+type Item struct {
+	ItemID        int        `json:"item_id,string"`
+	ResolvedID    int        `json:"resolved_id,string"`
+	GivenURL      string     `json:"given_url"`
+	ResolvedURL   string     `json:"resolved_url"`
+	GivenTitle    string     `json:"given_title"`
+	ResolvedTitle string     `json:"resolved_title"`
+	Favorite      int        `json:",string"`
+	Status        ItemStatus `json:",string"`
+	Excerpt       string
+	IsArticle     int                 `json:"is_article,string"`
+	// HasImage      ItemMediaAttachment `json:"has_image,string"`
+	// HasVideo      ItemMediaAttachment `json:"has_video,string"`
+	WordCount     int                 `json:"word_count,string"`
+
+	// Fields for detailed response
+	Tags    map[string]map[string]interface{}
+	Authors map[string]map[string]interface{}
+	Images  map[string]map[string]interface{}
+	Videos  map[string]map[string]interface{}
+
+	// Fields that are not documented but exist
+	// SortID        int       `json:"sort_id"`
+	// TimeAdded     time.Time `json:"time_added"`
+	// TimeUpdated   time.Time `json:"time_updated"`
+	// TimeRead      time.Time `json:"time_read"`
+	// TimeFavorited time.Time `json:"time_favorited"`
+}
+
+// RetrieveResult contains the response from a GET request
+type RetrieveResult struct {
+	List     map[string]Item
+	Status   int
+	Complete int
+	Since    int
 }
 
 // APIOrigin contains the destination
@@ -86,4 +128,25 @@ func GetAccessToken(consumerKey string, requestToken *RequestToken) (*AccessToke
 func GenerateAuthURL(code string, redirect string) string {
 	params := url.Values{ "request_token": {code}, "redirect_uri": {redirect}}
 	return fmt.Sprintf("%s/auth/authorize?%s", APIOrigin, params.Encode())
+}
+
+// PullArticles retrieves a list of articles
+func
+PullArticles(consumerKey string, accessToken *AccessToken, count int) (*RetrieveResult, error) {
+	result := &RetrieveResult{}
+	err := PostJSON("/v3/get",
+		map[string]string {
+			"consumer_key"	: consumerKey,
+			"access_token"	: accessToken.Token,
+			"detailType"    : "simple",
+			"count"         : fmt.Sprintf("%d", count),
+		},
+		result)
+
+	fmt.Printf("RES:%v\n", result)
+	if err != nil {
+	 	return nil, err
+	}
+
+	return result, nil
 }

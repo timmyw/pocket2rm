@@ -58,6 +58,7 @@ func main() {
 
 	switch *command {
 	case "pull":
+		p.PullFromPocket()
 	case "auth":
 		//p.Authorise()
 		//p.GetAccessToken()

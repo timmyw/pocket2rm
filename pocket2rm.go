@@ -10,6 +10,8 @@ const version = "0.0.1"
 
 // ConfigFile contains the default configuration file
 var ConfigFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
+
+// AccessFile contains the access token file
 var AccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.json")
 
 // Pocket2RM contains the interface to the Pocket2RM API
@@ -38,13 +40,6 @@ func (p *Pocket2RM) Init() {
 		p.AccessToken = accessToken
 	}
 	
-	// key, err := Authorise(p.Config.GetString("consumer_key"))
-
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// p.ConsumerKey = key
 	p.init = true
 }
 
@@ -75,6 +70,13 @@ func (p *Pocket2RM) GetAccessToken() {
 	SaveJSONToFile(AccessFile, p.AccessToken)
 }
 
-// func PullFromPocket() {
+// PullFromPocket retrieves a list of the articles from pocket and
+// compares against local state.
+func (p *Pocket2RM) PullFromPocket() {
+	result, err := PullArticles(p.ConsumerKey, p.AccessToken, 1)
+	if err != nil {
+		panic(err)
+	}
 
-// }
+	fmt.Printf("%v\n", result)
+}
