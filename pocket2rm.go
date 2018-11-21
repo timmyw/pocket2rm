@@ -14,6 +14,9 @@ var ConfigFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
 // AccessFile contains the access token file
 var AccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.json")
 
+// DatastoreFile contains the path to the SQLite3 database
+var DatastoreFile = os.ExpandEnv("$HOME/.config/pocket2rm.db")
+
 // Pocket2RM contains the interface to the Pocket2RM API
 type Pocket2RM struct {
 	version		 string

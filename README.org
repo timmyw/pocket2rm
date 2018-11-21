@@ -21,3 +21,9 @@ curl "https://getpocket.com/auth/authorize?redirect_uri=localhost&request_token=
 #+END_SRC
 code:81fd2224-564a-7989-f0af-bcd6f5
 
+* Dependencies
+
+#+BEGIN_SRC sh
+go get github.com/jacobstr/confer
+go get github.com/mattn/go-sqlite3
+#+END_SRC
