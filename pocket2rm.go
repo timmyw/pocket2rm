@@ -93,13 +93,13 @@ func (p *Pocket2RM) PullFromPocket(count int) {
 
 	// For each article from Pocket, check to see if it is new
 	for k := range pocketArticles.List {
-		fmt.Printf("key:%s\n", k)
+		//fmt.Printf("key:%s\n", k)
 		itemTime := p.isArticleKnown(k)
-		fmt.Printf("%v:%v\n", itemTime, NullTime)
+		//fmt.Printf("%v:%v\n", itemTime, NullTime)
 		if itemTime == NullTime {
 			// Need to add this one
 			newArticles = append(newArticles, k)
-			fmt.Printf("%v\n", newArticles)
+			//fmt.Printf("%v\n", newArticles)
 		}
 	}
 
@@ -134,4 +134,13 @@ func (p *Pocket2RM) AddArticle(itemID string, pocketArticles map[string]Item) {
 	url := item.ResolvedURL
 
 	fmt.Printf("%s\n", url)
+
+	var ad = &ArticleDetails{}
+	
+	err := p.GetArticleDetails(url, ad)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Author:%s\n", ad.Author)
 }

@@ -24,7 +24,8 @@ CREATE TABLE IF NOT EXISTS articles
    ResolvedURL    TEXT,
    ResolvedTitle  TEXT,
    DateFromPocket TEXT,
-   DatePushedToRM TEXT
+   DatePushedToRM TEXT,
+   MercuryData    TEXT
 )
 `,
 	)

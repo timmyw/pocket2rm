@@ -6,11 +6,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+//	"io/ioutil"
 )
 
-func sendJSON(req *http.Request, res interface{}) error {
+func sendJSON(req *http.Request, contentType string, res interface{}) error {
 	req.Header.Add("X-Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
+	if contentType != "" {
+		req.Header.Add("Content-Type", contentType)
+	}
+	
+	// fmt.Printf("REQ\nMETHOD: %s\n", req.Method)
+	// fmt.Printf("URL: %s\n", req.URL.String())
+	// for h,v := range req.Header {
+	// 	fmt.Printf("HDR: %s=%s\n", h, v)
+	// }
+	
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
@@ -21,24 +31,42 @@ func sendJSON(req *http.Request, res interface{}) error {
 	}
 
 	defer resp.Body.Close()
+
 	return json.NewDecoder(resp.Body).Decode(res)	
+}
+
+// GetJSON sends a GET request to the specified URL and receives JSON
+// in response
+func GetJSON(url string, origin string, headers map[string]string, res interface{}) error {
+	req, err := http.NewRequest("GET", APIOrigin[origin]+url, nil)
+	fmt.Printf("URL:%s\n", APIOrigin[origin]+url)
+	if err != nil {
+		return err
+	}
+
+	for h,v := range headers {
+		req.Header.Add(h, v)
+	}
+	
+	//return sendJSON(req, "text/html; charset=UTF-8", res)
+	return sendJSON(req, "text/plain", res)
 }
 
 // PostJSON creates a POST request with the supplied data, and sends
 // it using sendJSON.
-func PostJSON(url string, data, res interface{}) error {
+func PostJSON(url string, origin string, data, res interface{}) error {
 	body, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
 	// fmt.Printf("PARAMS:%v+\n", data)
-	req, err := http.NewRequest("POST", APIOrigin+url, bytes.NewReader(body))
+	req, err := http.NewRequest("POST", APIOrigin[origin]+url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
 
-	return sendJSON(req, res)
+	return sendJSON(req, "application/json; charset=UTF-8", res)
 }
 
 // SaveJSONToFile dumps the supplied struct to the file in JSON format

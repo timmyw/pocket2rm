@@ -53,9 +53,6 @@ type RetrieveResult struct {
 	Since    int
 }
 
-// APIOrigin contains the destination
-const APIOrigin = "https://getpocket.com"
-
 // Authorise carries out an auth call to Pocket to get a token
 func Authorise(consumerKey string) (string, error) {
 	// First step is to get a token from the Pocket servers
@@ -66,7 +63,7 @@ func Authorise(consumerKey string) (string, error) {
 	}
 
 	result := &PocketCode{}
-	err := PostJSON(url, params, result)
+	err := PostJSON(url, APIOriginPocket, params, result)
 
 	if err != nil {
 		return "", err
@@ -92,6 +89,7 @@ type RequestToken struct {
 func GetRequestToken(consumerKey string) (*RequestToken, error) {
 	result := &RequestToken{}	
 	err := PostJSON("/v3/oauth/request",
+		APIOriginPocket,
 		map[string]string {
 			"consumer_key"	: consumerKey,
 			"redirect_uri"  : "http://localhost",
@@ -110,6 +108,7 @@ func GetRequestToken(consumerKey string) (*RequestToken, error) {
 func GetAccessToken(consumerKey string, requestToken *RequestToken) (*AccessToken, error) {
 	result := &AccessToken{}
 	err := PostJSON("/v3/oauth/authorize",
+		APIOriginPocket,
 		map[string]string {
 			"consumer_key"	: consumerKey,
 			"code"		: requestToken.Code,
@@ -135,6 +134,7 @@ func
 PullArticles(consumerKey string, accessToken *AccessToken, count int) (*RetrieveResult, error) {
 	result := &RetrieveResult{}
 	err := PostJSON("/v3/get",
+		APIOriginPocket,
 		map[string]string {
 			"consumer_key"	: consumerKey,
 			"access_token"	: accessToken.Token,
