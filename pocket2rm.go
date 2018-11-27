@@ -3,6 +3,7 @@ package pocket2rm
 import (
 	"os"
 	"fmt"
+	"database/sql"
 	"github.com/jacobstr/confer"
 )
 
@@ -25,6 +26,8 @@ type Pocket2RM struct {
 	RequestToken	 *RequestToken
 	AccessToken      *AccessToken
 	init             bool
+
+	db               *sql.DB
 }
 
 // Init performs any initialisation (such as loading API keys etc).
@@ -36,6 +39,8 @@ func (p *Pocket2RM) Init() {
 	p.Config.ReadPaths(ConfigFile)
 	p.ConsumerKey = p.Config.GetString("consumer_key")
 
+	p.openDatabase()
+	
 	p.AccessToken = nil
 	accessToken := &AccessToken{}
 	err := LoadJSONFromFile(AccessFile, accessToken)
@@ -75,11 +80,58 @@ func (p *Pocket2RM) GetAccessToken() {
 
 // PullFromPocket retrieves a list of the articles from pocket and
 // compares against local state.
-func (p *Pocket2RM) PullFromPocket() {
-	result, err := PullArticles(p.ConsumerKey, p.AccessToken, 1)
+func (p *Pocket2RM) PullFromPocket(count int) {
+	pocketArticles, err := PullArticles(p.ConsumerKey, p.AccessToken, count)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%v\n", result)
+	var (
+		newArticles []string
+		removedArticles []string
+	)
+
+	// For each article from Pocket, check to see if it is new
+	for k := range pocketArticles.List {
+		fmt.Printf("key:%s\n", k)
+		itemTime := p.isArticleKnown(k)
+		fmt.Printf("%v:%v\n", itemTime, NullTime)
+		if itemTime == NullTime {
+			// Need to add this one
+			newArticles = append(newArticles, k)
+			fmt.Printf("%v\n", newArticles)
+		}
+	}
+
+	// For each article we already know about, check to see if it
+	// is still in the pocket list (otherwise it should be
+	// removed)
+	existingArticles, _ := p.listAllArticles()
+	for _,v := range existingArticles {
+		var found = false
+		for j := range pocketArticles.List {
+			if j == v {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			removedArticles = append(removedArticles, v)
+		}
+	}
+
+	for _, itemID := range newArticles {
+		p.AddArticle(itemID, pocketArticles.List)
+	}
+}
+
+// AddArticle will retrieve the HTML, generate a PDF, and upload it to
+// RM
+func (p *Pocket2RM) AddArticle(itemID string, pocketArticles map[string]Item) {
+
+	item := pocketArticles[itemID]
+	url := item.ResolvedURL
+
+	fmt.Printf("%s\n", url)
 }

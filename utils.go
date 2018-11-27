@@ -11,7 +11,6 @@ import (
 func sendJSON(req *http.Request, res interface{}) error {
 	req.Header.Add("X-Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
-	fmt.Printf("req.URL: %s\n", req.URL)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err
@@ -33,7 +32,7 @@ func PostJSON(url string, data, res interface{}) error {
 		return err
 	}
 
-	fmt.Printf("PARAMS:%v+\n", data)
+	// fmt.Printf("PARAMS:%v+\n", data)
 	req, err := http.NewRequest("POST", APIOrigin+url, bytes.NewReader(body))
 	if err != nil {
 		return err

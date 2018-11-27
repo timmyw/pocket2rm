@@ -143,7 +143,6 @@ PullArticles(consumerKey string, accessToken *AccessToken, count int) (*Retrieve
 		},
 		result)
 
-	fmt.Printf("RES:%v\n", result)
 	if err != nil {
 	 	return nil, err
 	}

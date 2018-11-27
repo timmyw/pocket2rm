@@ -48,6 +48,8 @@ func authWithPocket(p *p2rm.Pocket2RM) {
 func main() {
 
 	command := flag.String("command", "pull", "Command to execute")
+	count := flag.Int("count", 10, "Maximum number of articles to pull")
+	
 	flag.Parse()
 	fmt.Printf("%s\n", *command)
 
@@ -58,7 +60,7 @@ func main() {
 
 	switch *command {
 	case "pull":
-		p.PullFromPocket()
+		p.PullFromPocket(*count)
 	case "auth":
 		//p.Authorise()
 		//p.GetAccessToken()
