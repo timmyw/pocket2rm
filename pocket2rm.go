@@ -143,4 +143,5 @@ func (p *Pocket2RM) AddArticle(itemID string, pocketArticles map[string]Item) {
 	}
 
 	fmt.Printf("Author:%s\n", ad.Author)
+
 }

@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"strings"
 //	"io/ioutil"
 )
 
@@ -91,5 +92,17 @@ func LoadJSONFromFile(path string, v interface{}) error {
 	defer r.Close()
 
 	return json.NewDecoder(r).Decode(v)
+}
+
+// FixForFileName replaces any illegal characters in the supplied
+// string to allow it to be used as a filename.
+func FixForFileName(inp string) string {
+	var illegals = []string{ "!", "\"", "'", "$", "^", "*" }
+	out := inp
+	for _, v := range illegals {
+		out = strings.Replace(out, v, "_", -1)
+	}
+
+	return out
 }
 
