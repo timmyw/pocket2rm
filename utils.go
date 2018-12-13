@@ -94,15 +94,26 @@ func LoadJSONFromFile(path string, v interface{}) error {
 	return json.NewDecoder(r).Decode(v)
 }
 
-// FixForFileName replaces any illegal characters in the supplied
-// string to allow it to be used as a filename.
-func FixForFileName(inp string) string {
-	var illegals = []string{ "!", "\"", "'", "$", "^", "*" }
+func replaceChars(inp string, replace []string, with string) string {
 	out := inp
-	for _, v := range illegals {
-		out = strings.Replace(out, v, "_", -1)
+	for _, v := range replace {
+		out = strings.Replace(out, v, with, -1)
 	}
 
 	return out
 }
 
+// FixForFileName replaces any illegal characters in the supplied
+// string to allow it to be used as a filename.
+func FixForFileName(inp string) string {
+	return replaceChars(inp,
+		[]string{ "/", ":", "!", "\"", "'", "$", "^", "*", "\n", "\t", " " },
+		"_")		
+}
+
+// CleanCRLF removes any CR/LF characters and replaces them with spaces
+func CleanCRLF(inp string) string {
+	return replaceChars(inp,
+		[]string{ "\n", "\r" },
+		" ")		
+}

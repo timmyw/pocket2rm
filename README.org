@@ -26,4 +26,5 @@ code:81fd2224-564a-7989-f0af-bcd6f5
 #+BEGIN_SRC sh
 go get github.com/jacobstr/confer
 go get github.com/mattn/go-sqlite3
+go get github.com/jung-kurt/gofpdf
 #+END_SRC

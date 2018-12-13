@@ -2,6 +2,7 @@ package pocket2rm
 
 import (
 	"os"
+	"os/exec"
 	"fmt"
 	"database/sql"
 	"github.com/jacobstr/confer"
@@ -144,4 +145,36 @@ func (p *Pocket2RM) AddArticle(itemID string, pocketArticles map[string]Item) {
 
 	fmt.Printf("Author:%s\n", ad.Author)
 
+	output, err := p.GeneratePDF(ad)
+
+	fmt.Printf("PDF:%s\n", output)
+}
+
+// GeneratePDF creates a PDF from the supplied ArticleDetails
+func (p *Pocket2RM) GeneratePDF(ad* ArticleDetails) (string, error) {
+	filename := FixForFileName(ad.Title)
+	if filename == "" {
+		filename = FixForFileName(ad.URL)
+	}
+
+	fmt.Printf("filename:%s\n", filename)
+	
+	outputPath, err := GenerateOutputFilename(p.Config.GetString("pdf_file_store"), filename)
+	if err != nil {
+		return "", nil
+	}
+
+	gencmd := p.Config.GetString("pdf_gen_binary")
+	wrapcmd := p.Config.GetString("pdf_gen_wrapper")
+
+	cmd := exec.Command(wrapcmd, gencmd, ad.URL, outputPath)
+
+	err = cmd.Run()
+
+	if err != nil {
+		fmt.Printf("ERR:%s\n", err.Error())
+		return "", err
+	}
+	
+	return outputPath, err
 }
