@@ -21,6 +21,12 @@ curl "https://getpocket.com/auth/authorize?redirect_uri=localhost&request_token=
 #+END_SRC
 code:81fd2224-564a-7989-f0af-bcd6f5
 
+** reMarkable API
+
+Started working from here:
+https://github.com/splitbrain/ReMarkableAPI/wiki/Authentication
+
+
 * Dependencies
 
 #+BEGIN_SRC sh
