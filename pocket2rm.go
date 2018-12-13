@@ -14,7 +14,10 @@ const version = "0.0.1"
 var ConfigFile = os.ExpandEnv("$HOME/.config/pocket2rm.yaml")
 
 // AccessFile contains the access token file
-var AccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.json")
+var PocketAccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.json")
+
+// AccessFile contains the access token file
+var RMAccessFile = os.ExpandEnv("$HOME/.config/pocket2rm.access.rm.json")
 
 // DatastoreFile contains the path to the SQLite3 database
 var DatastoreFile = os.ExpandEnv("$HOME/.config/pocket2rm.db")
@@ -26,6 +29,7 @@ type Pocket2RM struct {
 	ConsumerKey	 string
 	RequestToken	 *RequestToken
 	AccessToken      *AccessToken
+	RMToken          *RMToken
 	init             bool
 
 	db               *sql.DB
@@ -44,9 +48,15 @@ func (p *Pocket2RM) Init() {
 	
 	p.AccessToken = nil
 	accessToken := &AccessToken{}
-	err := LoadJSONFromFile(AccessFile, accessToken)
+	err := LoadJSONFromFile(PocketAccessFile, accessToken)
 	if err == nil {
 		p.AccessToken = accessToken
+	}
+
+	rmAccessToken := &RMToken{}
+	err = LoadJSONFromFile(RMAccessFile, rmAccessToken)
+	if err == nil {
+		p.rmAccessToken = rmAccessToken
 	}
 	
 	p.init = true
@@ -76,7 +86,7 @@ func (p *Pocket2RM) GetAccessToken() {
 	fmt.Printf("%+v\n", *p.AccessToken)
 
 	// Store the token for next time
-	SaveJSONToFile(AccessFile, p.AccessToken)
+	SaveJSONToFile(PocketAccessFile, p.AccessToken)
 }
 
 // PullFromPocket retrieves a list of the articles from pocket and
@@ -177,4 +187,9 @@ func (p *Pocket2RM) GeneratePDF(ad* ArticleDetails) (string, error) {
 	}
 	
 	return outputPath, err
+}
+
+// ListFromRemarkable will pull a list from the RM cloud
+func (p *Pocket2RM) ListFromRemarkable() (string, error) {
+	return "", nil
 }

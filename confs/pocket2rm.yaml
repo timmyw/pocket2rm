@@ -3,3 +3,4 @@
 consumer_key: SECRET_KEY
 mercury_key: SECRET_KEY
 pdf_file_store: $HOME/local/pocket2rm/pdf
+wkpdftohtml_binary: 

@@ -61,6 +61,9 @@ func main() {
 	switch *command {
 	case "pull":
 		p.PullFromPocket(*count)
+	case "rmls":
+		p.ListFromRemarkable()
+		
 	case "auth":
 		//p.Authorise()
 		//p.GetAccessToken()
